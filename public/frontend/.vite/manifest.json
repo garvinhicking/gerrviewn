@@ -1,0 +1,27 @@
+{
+  "frontend/js/modules/multiselect.js": {
+    "file": "assets/multiselect-CJlR5ppC.js",
+    "name": "multiselect",
+    "src": "frontend/js/modules/multiselect.js",
+    "isDynamicEntry": true
+  },
+  "frontend/js/modules/table.js": {
+    "file": "assets/table-CdbKJxH7.js",
+    "name": "table",
+    "src": "frontend/js/modules/table.js",
+    "isDynamicEntry": true
+  },
+  "frontend/vite.entry.js": {
+    "file": "assets/vite.entry-B1Z00cic.js",
+    "name": "vite.entry",
+    "src": "frontend/vite.entry.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "frontend/js/modules/table.js",
+      "frontend/js/modules/multiselect.js"
+    ],
+    "css": [
+      "assets/vite-B86mOPfo.css"
+    ]
+  }
+}
