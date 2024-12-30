@@ -3,3 +3,6 @@ node_modules/*
 json/changes.json
 json/changes.log
 db/instance.sqlite
+.php-cs-fixer.cache
+composer.lock
+package-lock.json
