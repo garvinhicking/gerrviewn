@@ -5,6 +5,5 @@ use GarvinHicking\Gerrviewn\Core;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// TODO: I want to be a Symfony Console script.
 $app = new Core();
-$app->cliFetch();
+$app->run();
