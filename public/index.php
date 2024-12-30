@@ -19,7 +19,7 @@ function render_table(string $query): void {
         echo "<tr>";
 
         foreach($row as $key => $value) {
-            echo "<td>" . htmlspecialchars($value ?? '') . "</td>" . "\n";
+            echo "<td>" . nl2br(htmlspecialchars($value ?? '')) . "</td>" . "\n";
         }
 
         echo "</tr>";

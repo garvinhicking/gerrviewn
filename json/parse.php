@@ -56,6 +56,7 @@ $results = $database->query('UPDATE changes
                                       SET is_active = 0 
                                     WHERE is_active = 1');
 
+$coreTeam = explode("\n", file_get_contents('../db/mergers.csv'));
 $collectedOwners = [];
 foreach ($json as $index => $change) {
     $uid = create_or_fetch_change($change['virtual_id_number']);
@@ -152,6 +153,19 @@ foreach($collectedOwners as $name => $userdata) {
 
 echo count($collectedOwners) . " Owners evaluated.\n";
 
+$leaderboard = [];
+$coreTeamPatches = 0;
+foreach($collectedOwners as $name => $userdata) {
+    if (in_array($userdata['usernames'][0], $coreTeam)) {
+        $coreTeamPatches += $userdata['count'];
+    }
+    $leaderboard[$name] = $userdata['count'];
+}
+
+echo "Total Core team patches: " . $coreTeamPatches . "\n";
+echo "Individual patches:\n";
+arsort($leaderboard);
+print_r($leaderboard);
 /*
 SOLVED:
 ============================================================
