@@ -1,0 +1,78 @@
+{
+  "name": "garvinhicking/gerrviewn",
+  "repositories": {
+    "local": {
+      "type": "path",
+      "url": "./src/*"
+    }
+  },
+
+  "require": {
+    "ext-sqlite3": "*",
+    "ext-iconv": "*",
+    "ext-json": "*",
+    "php": "^8.0"
+  },
+
+  "require-dev": {
+    "phpstan/phpstan": "^2.0",
+    "friendsofphp/php-cs-fixer": "^3.66",
+    "squizlabs/php_codesniffer": "^3.11"
+  },
+
+  "config": {
+    "platform": {
+      "php": "8.4"
+    }
+  },
+
+  "autoload": {
+    "psr-4": {
+      "GarvinHicking\\Gerrviewn\\": "src/"
+    }
+  },
+
+  "scripts": {
+    "phpcs": "phpcs --standard=phpcs.xml",
+    "ci:composer:psr-verify": "@composer dumpautoload --optimize --strict-psr --no-plugins",
+    "ci:php": [
+      "@ci:php:cs-fixer",
+      "@ci:php:lint",
+      "@ci:php:sniff",
+      "@ci:php:stan"
+    ],
+    "ci:php:cs-fixer": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --config .php-cs-fixer.php -v --dry-run --diff",
+    "ci:php:lint": "find .*.php *.php src -name '*.php' -print0 2>/dev/null | xargs -r -0 -n 1 -P 4 php -l 1>/dev/null",
+
+    "ci:php:sniff": "phpcs src",
+    "ci:php:stan": "phpstan --no-progress --memory-limit=2G",
+    "ci:static": [
+      "@ci:php:cs-fixer",
+      "@ci:php:lint",
+      "@ci:php:sniff",
+      "@ci:php:stan"
+    ],
+    "fix:php": [
+      "@fix:php:cs",
+      "@fix:php:sniff"
+    ],
+    "fix:php:cs": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --config .php-cs-fixer.php",
+    "fix:php:sniff": "phpcbf src",
+    "phpstan:baseline": "phpstan --generate-baseline --allow-empty-baseline"
+  },
+
+  "scripts-descriptions": {
+    "ci:composer:psr-verify": "Verifies PSR-4 namespace correctness.",
+    "ci:php": "Runs all static checks for the PHP files.",
+    "ci:php:cs-fixer": "Checks the code style with the PHP Coding Standards Fixer (PHP-CS-Fixer).",
+    "ci:php:lint": "Lints the PHP files for syntax errors.",
+    "ci:php:sniff": "Checks the code style with PHP_CodeSniffer (PHPCS).",
+    "ci:php:stan": "Checks the PHP types using PHPStan.",
+
+    "ci:static": "Runs all static code checks (syntax, style, types).",
+    "fix:php": "Runs all fixers for the PHP code.",
+    "fix:php:cs": "Fixes the code style with PHP-CS-Fixer.",
+    "fix:php:sniff": "Fixes the code style with PHP_CodeSniffer.",
+    "phpstan:baseline": "Updates the PHPStan baseline file to match the code."
+  }
+}
