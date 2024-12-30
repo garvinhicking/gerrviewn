@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace GarvinHicking\Gerrviewn;
@@ -12,7 +13,7 @@ final readonly class Core
     private string $path;
     private string $webroot;
     private LogService $logService;
-    private ?bool $isInitialized;
+    private bool $isInitialized;
 
     public function __construct()
     {
@@ -48,7 +49,8 @@ final readonly class Core
         }
     }
 
-    public function cliFetch(): void {
+    public function cliFetch(): void
+    {
         if ($this->isInitialized) {
             return;
         }
@@ -57,7 +59,8 @@ final readonly class Core
         $this->logService->emit();
     }
 
-    public function cliParse(): void {
+    public function cliParse(): void
+    {
         if ($this->isInitialized) {
             return;
         }
@@ -69,9 +72,13 @@ final readonly class Core
     public function initDatabaseTables(): void
     {
         $sqlFiles = glob($this->path . 'structure-*.sql');
+        if (!is_array($sqlFiles)) {
+            return;
+        }
+
         foreach ($sqlFiles as $sqlFile) {
             // SQLite only supports one statement per file.
-            if (!$this->db->exec(file_get_contents($sqlFile))) {
+            if (!$this->db->exec((string) file_get_contents($sqlFile))) {
                 throw new RuntimeException('Cannot execute SQL in file ' . $sqlFile);
             }
         }
@@ -80,7 +87,7 @@ final readonly class Core
     public function timestampedUri(string $path): string
     {
         $f = filemtime($path);
-        return preg_replace('@^' . preg_quote($this->webroot) . '@i', '', $path) . '?' . $f;
+        return preg_replace('@^' . preg_quote($this->webroot, '@') . '@i', '', $path) . '?' . $f;
     }
 
     public function run(): bool
@@ -96,18 +103,23 @@ final readonly class Core
         return true;
     }
 
-    public function includeViteAssets(): string {
+    public function includeViteAssets(): string
+    {
         // We could fetch this from manifest.json, but why not Zoidberg this?
         $js = glob($this->webroot . '/frontend/assets/vite.entry-*.js');
         $css = glob($this->webroot . '/frontend/assets/vite-*.css');
 
         $out = '';
-        foreach($js as $file) {
-            $out .= '    <script type="module" src="' . $this->timestampedUri($file) . '"></script>' . "\n";
+        if (is_array($js)) {
+            foreach ($js as $file) {
+                $out .= '    <script type="module" src="' . $this->timestampedUri($file) . '"></script>' . "\n";
+            }
         }
 
-        foreach($css as $file) {
-            $out .= '    <link media="screen" href="' . $this->timestampedUri($file) . '" rel="stylesheet">' . "\n";
+        if (is_array($css)) {
+            foreach ($css as $file) {
+                $out .= '    <link media="screen" href="' . $this->timestampedUri($file) . '" rel="stylesheet">' . "\n";
+            }
         }
 
         return $out;
