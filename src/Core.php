@@ -173,7 +173,41 @@ final readonly class Core
                 // TODO: Parse all forge links ("Resolves", "Related")
                 $out .= '
                 <details>
-                    <summary>' . htmlspecialchars($row['title'] ?? 'N/A') . '</summary>
+                    <summary>
+                        ' . htmlspecialchars($row['title'] ?? 'N/A') . '
+                        <div class="mainLine">
+                            <div class="extra">
+                            ' . $row['comments'] . ' comments, ' . $row['patch_size'] . ' lines.
+                            </div>
+                            <div class="author">
+                            ' . htmlspecialchars($row['owner'] ?? 'N/A') . '
+                            </div>
+                        </div>
+                        <div class="mainLine">
+                            <div class="extra2">
+                            ' . date('d.m.Y H:i', (int) $row['last_modified']) . '
+                            </div>
+                            <div class="branch">
+                            ' . htmlspecialchars($row['branch'] ?? 'N/A') . '
+                            </div>
+                        </div>
+                        <div class="mainLine">
+                            <div class="extra3">
+                            &nbsp;
+                            </div>
+                            <div class="age">
+                                <span title="Last touched">' . $this->daysSince((int) $row['last_modified'], time()) . '</span>
+                            </div>
+                        </div>
+                        <div class="mainLine">
+                            <div class="extra4">
+                            &nbsp;
+                            </div>
+                            <div class="age2">
+                                <span title="Days since creation on ' . date('d.m.Y H:i', (int) $row['created']) . '">' . $this->daysSince((int) $row['created'], time()) . '</span>
+                            </div>
+                        </div>
+                    </summary>
                     <article>
                         <div class="gerrit_link">
                             <a href="' . htmlspecialchars($row['url'] ?? '') . '">Gerrit</a>
@@ -193,5 +227,26 @@ final readonly class Core
         $out .= '</ol>';
 
         return $out;
+    }
+
+    public function daysSince(int $created, int $modified): string
+    {
+        $seconds = $modified - $created;
+
+        if ($seconds < 86400) {
+            return '<span class="hours">' . ceil($seconds / 60 / 60) . ' hours</span>';
+        }
+
+        $days = ceil($seconds / 60 / 60 / 24);
+
+        if ($days > 365) {
+            return '<span class="years">' . round($days / 365, 2) . ' years</span>';
+        }
+
+        if ($days > 30) {
+            return '<span class="months">' . round($days / 30, 2) . ' months</span>';
+        }
+
+        return '<span class="days">' . $days . ' days</span>';
     }
 }

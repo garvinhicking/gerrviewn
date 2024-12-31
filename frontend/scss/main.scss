@@ -9,6 +9,67 @@ body {
 li.issue {
     margin: 10px;
 
+    .mainLine {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .title {
+        }
+        .author {
+        }
+        .extra {
+            font-weight: normal;
+        }
+        .extra2 {
+            font-weight: normal;
+        }
+        .extra3 {
+            font-weight: normal;
+        }
+        .branch {
+            font-weight: normal;
+        }
+
+        .age::before {
+            content: "\01F4C9"; /* 📉 */
+        }
+
+        .age2::before {
+            content: "\01F382"; /* 🎂 */
+        }
+
+        .age, .age2 {
+            font-weight: normal;
+            font-size: 0.8em;
+
+            .hours::after {
+                content: "	\01F550"; /* 🕐 */
+                padding-left: 5px;
+            }
+            .days::after {
+                content: "	\01F31E"; /* 🌞 */
+                padding-left: 5px;
+            }
+            .months::after {
+                content: "	\01F31C"; /* 🌜 */
+                padding-left: 5px;
+            }
+            .years::after {
+                content: "	\01F31A"; /* 🌚 */
+                padding-left: 5px;
+            }
+
+            .months {
+                color: blueviolet;
+            }
+            .years {
+                color: red;
+            }
+
+        }
+    }
+
     .gerrit_link {
     }
 
