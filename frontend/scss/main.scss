@@ -3,4 +3,52 @@
 
 body {
     background-color: white;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+li.issue {
+    margin: 10px;
+
+    .gerrit_link {
+    }
+
+    .forge_link {
+    }
+
+    summary {
+        background-color: lightgrey;
+        color: black;
+        border-radius: 20px;
+        cursor: pointer;
+        padding: 10px;
+        font-weight: bold;
+    }
+
+    summary::marker {
+        color: darkorange;
+    }
+
+    details[open] summary {
+        border-radius: 20px 20px 0 0;
+    }
+
+    details {
+        border-radius: 5px;
+    }
+
+    /* extra styles */
+    article > *:first-child {
+        margin: 0;
+    }
+
+    article > * + * {
+        margin: 0.75em 0 0 0;
+    }
+
+    article {
+        padding: 10px;
+        margin: 0;
+        background: lightgrey;
+        border-radius: 0 0px 20px 20px;
+    }
 }

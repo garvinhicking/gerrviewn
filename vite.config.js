@@ -31,6 +31,11 @@ const BASE_CONFIG= {
     assetsInlineLimit: 0, // disable inlining of assets!
     rollupOptions: {
       input: ENTRY_POINTS.map(entry => resolve(rootPath, entry)),
+      output: {
+        chunkFileNames: 'assets/[name]-static.js',
+        assetFileNames: 'assets/[name]-static[extname]',
+        entryFileNames: 'assets/[name]-static.js',
+      }
     },
     outDir: resolve(rootPath, BUILD_PATH),
     target: 'es2020',
