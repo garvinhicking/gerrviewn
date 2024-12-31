@@ -90,6 +90,7 @@ final readonly class Core
         return preg_replace('@^' . preg_quote($this->webroot, '@') . '@i', '', $path) . '?' . $f;
     }
 
+    // TODO: Who needs templating when PHP is a template language on its own...
     public function run(): bool
     {
         if (!isset($this->db)) {
@@ -97,7 +98,13 @@ final readonly class Core
         }
 
         echo $this->htmlHead();
-        echo 'MAIN APP RUNNING.';
+
+        echo '<h1>Gerrit patches ON MAIN</h1>';
+        echo $this->renderList('SELECT * FROM changes WHERE branch = "main" AND is_active = 1');
+
+        echo '<h1>Gerrit patches cherry-picks</h1>';
+        echo $this->renderList('SELECT * FROM changes WHERE branch != "main" AND is_active = 1');
+
         echo $this->htmlFooter();
 
         return true;
@@ -144,5 +151,47 @@ final readonly class Core
     public function htmlFooter(): string
     {
         return '</body></html>';
+    }
+
+    public function renderList(string $query): string
+    {
+        $results = $this->db->query($query);
+
+        if ($results === false) {
+            return '';
+        }
+
+        $out = '<ol>';
+
+        do {
+            /** @var false|array<string, ?string> $row */
+            $row = $results->fetchArray(SQLITE3_ASSOC);
+
+            if (is_array($row)) {
+                $out .= '<li class="issue">';
+
+                // TODO: Parse all forge links ("Resolves", "Related")
+                $out .= '
+                <details>
+                    <summary>' . htmlspecialchars($row['title'] ?? 'N/A') . '</summary>
+                    <article>
+                        <div class="gerrit_link">
+                            <a href="' . htmlspecialchars($row['url'] ?? '') . '">Gerrit</a>
+                       </div>
+                        <div class="forge_link">
+                            <a href="#">Forge</a>
+                        </div>
+
+                        ' . nl2br(htmlspecialchars($row['commit_message'] ?? '')) . '
+                    </article>
+                </details>';
+
+                $out .= '</li>' . "\n";
+            }
+        } while ($row !== false);
+
+        $out .= '</ol>';
+
+        return $out;
     }
 }
