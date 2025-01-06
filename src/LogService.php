@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GarvinHicking\Gerrviewn;
 
-// TODO: When I grow up, I want to be a PSR logger
+// @TODO: When I grow up, I want to be a PSR logger
 final class LogService
 {
     private readonly string $storage;

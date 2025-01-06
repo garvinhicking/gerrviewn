@@ -29,7 +29,7 @@ final readonly class RemoteService
             . '&o=WEB_LINKS'
             . '&n=1000';
         $this->storage = __DIR__ . '/../json/changes.json';
-        // TODO: Refactor me into a CSV|User Service
+        // @TODO: Refactor me into a CSV|User Service
         $this->csvMergers = __DIR__ . '/../db/mergers.csv';
         // $this->csvRegulars = __DIR__ . '/../db/regulars.csv';
         // $this->csvSpecial = __DIR__ . '/../db/special.csv';
@@ -155,12 +155,12 @@ final readonly class RemoteService
                 continue;
             }
 
-            // TODO: [BUGFIX] / [TASK] / [DOCS] / [FEATURE] | category
-            // TODO: [!!!] | is_breaking
-            // TODO: unresolved_comment_count
-            // TODO: "I've seen this"
-            // TODO: "I want this"
-            // TODO: "Please move forward"
+            // @TODO: [BUGFIX] / [TASK] / [DOCS] / [FEATURE] | category
+            // @TODO: [!!!] | is_breaking
+            // @TODO: unresolved_comment_count
+            // @TODO: "I've seen this"
+            // @TODO: "I want this"
+            // @TODO: "Please move forward"
             $updateQuery->bindValue(':title', $change['subject'], SQLITE3_TEXT);
             $updateQuery->bindValue(':owner', $change['owner']['name'], SQLITE3_TEXT);
             $updateQuery->bindValue(':owner_avatar', $this->findBiggestAvatar($change['owner']['avatars']), SQLITE3_TEXT);

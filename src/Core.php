@@ -97,7 +97,7 @@ final readonly class Core
         return preg_replace('@^' . preg_quote($this->webroot, '@') . '@i', '', $path) . '?' . $f;
     }
 
-    // TODO: Who needs templating when PHP is a template language on its own...
+    // @TODO: Who needs templating when PHP is a template language on its own...
     public function run(): bool
     {
         if (!isset($this->db)) {
@@ -180,7 +180,7 @@ final readonly class Core
             if (is_array($row)) {
                 $out .= '<li class="issue">';
 
-                // TODO: Parse all forge links ("Resolves", "Related")
+                // @TODO: Parse all forge links ("Resolves", "Related")
                 $out .= '
                 <details>
                     <summary>

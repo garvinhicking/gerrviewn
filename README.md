@@ -10,5 +10,6 @@ on the TYPO3 core and gaining insight over open patches.
 - Core-Owner andere Farbe
 - Regulars (Leute wie Torben) andere Farbe
 - avatars
--
+- anzahl patchsets / revisions
+
 Title | WIP? | Owner | Involved People | Branch | Created / Last Modified / Age | Votes
