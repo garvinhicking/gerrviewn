@@ -1,8 +1,54 @@
 @import "tabulator-tables/src/scss/tabulator.scss";
 @import "tom-select/dist/scss/tom-select";
 
+/** DARK MODE **/
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: black;
+        --text-color: white;
+        --highlight-color: orange;
+        --box-color: #303030;
+        --prio-1-color: blueviolet;
+        --prio-2-color: red;
+    }
+}
+
+/** LIGHT MODE **/
+:root {
+    --bg-color: white;
+    --text-color: black;
+    --highlight-color: orange;
+    --box-color: lightgray;
+    --prio-1-color: blueviolet;
+    --prio-2-color: red;
+}
+
+/** OVERRIDES (COPY FROM ABOVE) **/
+/** LIGHT MODE **/
+
+[data-theme="dark"] {
+    --bg-color: black;
+    --text-color: white;
+    --highlight-color: orange;
+    --box-color: #303030;
+    --prio-1-color: blueviolet;
+    --prio-2-color: red;
+}
+
+[data-theme="light"] {
+    --bg-color: white;
+    --text-color: black;
+    --highlight-color: orange;
+    --box-color: lightgray;
+    --prio-1-color: blueviolet;
+    --prio-2-color: red;
+}
+
+
 body {
-    background-color: white;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
@@ -61,10 +107,10 @@ li.issue {
             }
 
             .months {
-                color: blueviolet;
+                color: var(--prio-1-color);
             }
             .years {
-                color: red;
+                color: var(--prio-2-color);
             }
 
         }
@@ -77,8 +123,8 @@ li.issue {
     }
 
     summary {
-        background-color: lightgrey;
-        color: black;
+        background-color: var(--box-color);
+        color: var(--text-color);
         border-radius: 20px;
         cursor: pointer;
         padding: 10px;
@@ -86,7 +132,7 @@ li.issue {
     }
 
     summary::marker {
-        color: darkorange;
+        color: var(--highlight-color);
     }
 
     details[open] summary {
@@ -109,7 +155,28 @@ li.issue {
     article {
         padding: 10px;
         margin: 0;
-        background: lightgrey;
+        background: var(--box-color);
         border-radius: 0 0px 20px 20px;
     }
 }
+
+#theme-toggle {
+    display: block;
+    margin: 15px auto;
+}
+
+button {
+    cursor: pointer;
+    background-color: var(--box-color);
+    border: 1px solid var(--highlight-color);
+    color: var(--text-color);
+    border-radius: 20px;
+    padding: 15px;
+}
+
+button:hover {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--box-color);
+    color: var(--text-color);
+}
+

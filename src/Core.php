@@ -150,7 +150,10 @@ final readonly class Core
 
     public function htmlFooter(): string
     {
-        return '</body></html>';
+        return '
+    <button id="theme-toggle">Toggle dark/light mode</button>
+</body>
+</html>';
     }
 
     public function renderList(string $query): string
