@@ -187,7 +187,10 @@ final readonly class Core
                         ' . htmlspecialchars($row['title'] ?? 'N/A') . '
                         <div class="mainLine">
                             <div class="extra">
-                            ' . $row['comments'] . ' comments, ' . $row['patch_size'] . ' lines.
+                            <span class="highlight-box">' . $this->weighPatchSize((int) $row['patch_size']) . '</span>
+                            ' . $row['comments'] . ' comments'
+                            . ($row['comments_unresolved'] > 0 ? ' (<strong class="danger">' . $row['comments_unresolved'] . ' open</strong>)' : '')
+                            . ', ' . $row['patch_size'] . ' lines' . '
                             </div>
                             <div class="author">
                               <img class="avatar" src="' . htmlspecialchars($row['owner_avatar'] ?? '') . '" />' . htmlspecialchars($row['owner'] ?? 'N/A') . '
@@ -260,5 +263,29 @@ final readonly class Core
         }
 
         return '<span class="days">' . $days . ' days</span>';
+    }
+
+    /**
+     * Calculation to put size thresholds into readable "XL", "L", "M", ... outputs
+     */
+    private function weighPatchSize(int $patch_size): string
+    {
+        if ($patch_size < 8) {
+            return 'XS';
+        }
+
+        if ($patch_size < 50) {
+            return 'S';
+        }
+
+        if ($patch_size < 250) {
+            return 'M';
+        }
+
+        if ($patch_size < 500) {
+            return 'L';
+        }
+
+        return 'XL';
     }
 }

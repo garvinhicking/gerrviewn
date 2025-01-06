@@ -108,6 +108,7 @@ final readonly class RemoteService
          *     updated: string,
          *     created: string,
          *     total_comment_count: int,
+         *     unresolved_comment_count: int,
          *     branch: string,
          *     insertions: int,
          *     deletions: int,
@@ -144,6 +145,7 @@ final readonly class RemoteService
                       last_modified = :last_modified,
                       created = :created,
                       comments = :comments,
+                      comments_unresolved = :comments_unresolved,
                       commit_message = :commit_message,
                       branch = :branch
                 WHERE uid = ' . $uid
@@ -167,7 +169,8 @@ final readonly class RemoteService
             $updateQuery->bindValue(':patch_size', abs($change['insertions']) + abs($change['deletions']), SQLITE3_INTEGER);
             $updateQuery->bindValue(':last_modified', strtotime($change['updated']), SQLITE3_INTEGER);
             $updateQuery->bindValue(':created', strtotime($change['created']), SQLITE3_TEXT);
-            $updateQuery->bindValue(':comments', $change['total_comment_count'], SQLITE3_TEXT);
+            $updateQuery->bindValue(':comments', $change['total_comment_count'], SQLITE3_INTEGER);
+            $updateQuery->bindValue(':comments_unresolved', $change['unresolved_comment_count'], SQLITE3_INTEGER);
             $updateQuery->bindValue(':commit_message', $change['revisions'][$change['current_revision']]['commit']['message'], SQLITE3_TEXT);
             $updateQuery->bindValue(':branch', $change['branch'], SQLITE3_TEXT);
 
@@ -244,9 +247,11 @@ final readonly class RemoteService
         created = 2024-12-28 09:43:41.000000000
         updated = 2024-12-28 09:43:41.000000000
         total_comment_count
+        unresolved_comment_count
         virtual_id_number
         owner[name]
         owner[username]
+        owner[avatars]
         insertions = code zeilen mit änderungen
         deletions = code zeilen mit löschungen
 
@@ -257,7 +262,6 @@ final readonly class RemoteService
         status = immer NEW?
         attention_set
         submit_type = immer CHERRY_PICK ?
-        unresolved_comment_count
 
         labels[Verified][recommended]
         labels[Code-Review][recommended]

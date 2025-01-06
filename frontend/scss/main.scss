@@ -10,6 +10,8 @@
         --box-color: #303030;
         --prio-1-color: blueviolet;
         --prio-2-color: red;
+        --highlight-box-background: #808080;
+        --highlight-box-color: black;
     }
 }
 
@@ -21,6 +23,8 @@
     --box-color: lightgray;
     --prio-1-color: blueviolet;
     --prio-2-color: red;
+    --highlight-box-background: #808080;
+    --highlight-box-color: black;
 }
 
 /** OVERRIDES (COPY FROM ABOVE) **/
@@ -33,6 +37,8 @@
     --box-color: #303030;
     --prio-1-color: blueviolet;
     --prio-2-color: red;
+    --highlight-box-background: #808080;
+    --highlight-box-color: black;
 }
 
 [data-theme="light"] {
@@ -42,6 +48,8 @@
     --box-color: lightgray;
     --prio-1-color: blueviolet;
     --prio-2-color: red;
+    --highlight-box-background: #808080;
+    --highlight-box-color: black;
 }
 
 
@@ -172,6 +180,20 @@ li.issue {
 
     a:hover {
         text-decoration: none;
+    }
+
+    .danger {
+        color: var(--highlight-color);
+    }
+
+    .highlight-box {
+        border-radius: 8px;
+        background-color: var(--highlight-box-background);
+        color: var(--highlight-box-color);
+        border: 1px solid var(--box-color);
+        font-family: courier;
+        font-size: 0.8em;
+        padding: 10px;
     }
 }
 

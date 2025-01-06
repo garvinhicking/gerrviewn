@@ -17,6 +17,7 @@ CREATE TABLE changes (
      last_modified INTEGER,
      created INTEGER,
      comments INTEGER,
+     comments_unresolved INTEGER,
      commit_message TEXT,
      branch TEXT
 );
