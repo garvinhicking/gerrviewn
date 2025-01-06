@@ -25,6 +25,14 @@
     --prio-2-color: red;
     --highlight-box-background: #808080;
     --highlight-box-color: black;
+
+    --vote-none-color: darkgray;
+    --vote-pos-color: green;
+    --vote-neg-color: red;
+
+    --vote-pos-bg: #D0FFD0;
+    --vote-neg-bg: #FFD0D0;
+    --vote-maybe-bg: #FFFFA0;
 }
 
 /** OVERRIDES (COPY FROM ABOVE) **/
@@ -195,6 +203,102 @@ li.issue {
         font-size: 0.8em;
         padding: 10px;
     }
+}
+
+.votevatar {
+    height: 30px;
+    margin: 0 7px 0 0;
+}
+
+.core-member {
+    border-radius: 12px;
+}
+
+.ci-member {
+    border-radius: 2px;
+    height: 15px;
+}
+
+.ci-member.no-codereview {
+    border-bottom: 0px;
+    border-right: 0px;
+}
+
+.no-verified {
+    border-top: 2px solid var(--vote-none-color);
+    border-left: 2px solid var(--vote-none-color);
+}
+
+.no-codereview {
+    border-right: 2px solid var(--vote-none-color);
+    border-bottom: 2px solid var(--vote-none-color);
+}
+
+.upvote1-verified {
+    border-top: 2px solid var(--vote-pos-color);
+    border-left: 2px solid var(--vote-pos-color);
+}
+
+.upvote2-verified {
+    border-top: 4px solid var(--vote-pos-color);
+    border-left: 4px solid var(--vote-pos-color);
+}
+
+.upvote1-codereview {
+    border-right: 2px solid var(--vote-pos-color);
+    border-bottom: 2px solid var(--vote-pos-color);
+}
+
+.upvote2-codereview {
+    border-right: 4px solid var(--vote-pos-color);
+    border-bottom: 4px solid var(--vote-pos-color);
+}
+
+
+
+.downvote1-verified {
+    border-top: 2px solid var(--vote-neg-color);
+    border-left: 2px solid var(--vote-neg-color);
+}
+
+.downvote2-verified {
+    border-top: 4px solid var(--vote-neg-color);
+    border-left: 4px solid var(--vote-neg-color);
+}
+
+.downvote1-codereview {
+    border-right: 2px solid var(--vote-neg-color);
+    border-bottom: 2px solid var(--vote-neg-color);
+}
+
+.downvote2-codereview {
+    border-right: 4px solid var(--vote-neg-color);
+    border-bottom: 4px solid var(--vote-neg-color);
+}
+
+.merge-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.merge-possible {
+    background-color: var(--vote-pos-bg);
+}
+
+.merge-maybe-possible {
+    background-color: var(--vote-maybe-bg);
+}
+
+.merge-impossible {
+    background-color: var(--vote-neg-bg);
+}
+
+.merge-neutral {
 }
 
 #theme-toggle {

@@ -98,7 +98,7 @@ final readonly class RemoteService
          *     virtual_id_number: int,
          *     owner: array{
          *         name: string,
-         *         username: string,
+         *         username: ?string,
          *         avatars: array<int, array{
          *             url: string,
          *             height: int,
@@ -115,6 +115,32 @@ final readonly class RemoteService
          *     revisions: array<string, array{
          *         commit: array{message: string}
          *     }>,
+         *     labels: array{
+         *         Verified: array{
+         *             all: array<int, array{
+         *                 username: ?string,
+         *                 name: string,
+         *                 permitted_voting_range: array{min: int, max: int},
+         *                 value: int,
+         *                 avatars: array<int, array{
+         *                     url: string,
+         *                     height: int,
+         *                 }>
+         *             }>
+         *         },
+         *         Code-Review: array{
+         *             all: array<int, array{
+         *                 username: ?string,
+         *                 name: string,
+         *                 permitted_voting_range: array{min: int, max: int},
+         *                 value: int,
+         *                 avatars: array<int, array{
+         *                     url: string,
+         *                     height: int,
+         *                 }>
+         *             }>
+         *         }
+         *     },
          *     current_revision: string
          * }> $json
          */
@@ -128,10 +154,38 @@ final readonly class RemoteService
                 ];
             }
 
+            $involved = [];
+            $score = [
+                'Verified'   => 0,
+                'Code-Review' => 0,
+            ];
+
             $collectedOwners[$change['owner']['name']]['count']++;
             if (!in_array($change['owner']['username'], $collectedOwners[$change['owner']['name']]['usernames'])) {
                 $collectedOwners[$change['owner']['name']]['usernames'][] = $change['owner']['username'];
+                $involved[$change['owner']['username']] = [
+                    'comments'      => 0,
+                    'Verified'      => 0,
+                    'Code-Review'   => 0,
+                    'owner'         => true,
+                    'ci'            => false,
+                    'username'      => $change['owner']['name'],
+                    'avatar'        => $this->findBiggestAvatar($change['owner']['avatars']),
+                ];
             }
+
+            $involved['core-ci'] = [
+                'comments'      => 0,
+                'Verified'      => 0,
+                'Code-Review'   => 0,
+                'owner'         => false,
+                'ci'            => true,
+                'username'      => 'TYPO3 CI',
+                'avatar'        => '',
+            ];
+
+            $this->addToInvolved($change, 'Verified', $involved);
+            $this->addToInvolved($change, 'Code-Review', $involved);
 
             $updateQuery = $this->database->prepare(
                 'UPDATE changes
@@ -147,7 +201,9 @@ final readonly class RemoteService
                       comments = :comments,
                       comments_unresolved = :comments_unresolved,
                       commit_message = :commit_message,
-                      branch = :branch
+                      branch = :branch,
+                      debug = :debug,
+                      involved = :involved
                 WHERE uid = ' . $uid
             );
 
@@ -155,12 +211,6 @@ final readonly class RemoteService
                 continue;
             }
 
-            // @TODO: [BUGFIX] / [TASK] / [DOCS] / [FEATURE] | category
-            // @TODO: [!!!] | is_breaking
-            // @TODO: unresolved_comment_count
-            // @TODO: "I've seen this"
-            // @TODO: "I want this"
-            // @TODO: "Please move forward"
             $updateQuery->bindValue(':title', $change['subject'], SQLITE3_TEXT);
             $updateQuery->bindValue(':owner', $change['owner']['name'], SQLITE3_TEXT);
             $updateQuery->bindValue(':owner_avatar', $this->findBiggestAvatar($change['owner']['avatars']), SQLITE3_TEXT);
@@ -173,7 +223,16 @@ final readonly class RemoteService
             $updateQuery->bindValue(':comments_unresolved', $change['unresolved_comment_count'], SQLITE3_INTEGER);
             $updateQuery->bindValue(':commit_message', $change['revisions'][$change['current_revision']]['commit']['message'], SQLITE3_TEXT);
             $updateQuery->bindValue(':branch', $change['branch'], SQLITE3_TEXT);
+            $updateQuery->bindValue(':debug', print_r($change, true), SQLITE3_TEXT);
 
+            $updateQuery->bindValue(':involved', $this->parseInvolved($involved, $coreTeam, ($change['unresolved_comment_count'] > 0)), SQLITE3_TEXT);
+
+            /*
+             * messages[<int>][author][username|avatars|name]
+             * messages[<int>][date]
+             * skip when: messages[<int>][tag] === autogenerated:gerrit:newPatchSet
+             * skip when: messages[<int>][author][username] === core-ci
+             */
             $result = $updateQuery->execute();
             $updateQuery->close();
 
@@ -346,5 +405,234 @@ final readonly class RemoteService
         }
 
         return $pickedAvatar;
+    }
+
+    /**
+     * @param array{
+     *     virtual_id_number: int,
+     *     owner: array{
+     *         name: string,
+     *         username: ?string,
+     *         avatars: array<int, array{
+     *             url: string,
+     *             height: int,
+     *         }>
+     *     },
+     *     subject: string,
+     *     updated: string,
+     *     created: string,
+     *     total_comment_count: int,
+     *     unresolved_comment_count: int,
+     *     branch: string,
+     *     insertions: int,
+     *     deletions: int,
+     *     revisions: array<string, array{
+     *         commit: array{message: string}
+     *     }>,
+     *     labels: array{
+     *         Verified: array{
+     *             all: array<int, array{
+     *                 username: ?string,
+     *                 name: string,
+     *                 permitted_voting_range: array{min: int, max: int},
+     *                 value: int,
+     *                 avatars: array<int, array{
+     *                     url: string,
+     *                     height: int,
+     *                 }>
+     *             }>
+     *         },
+     *         Code-Review: array{
+     *             all: array<int, array{
+     *                 username: ?string,
+     *                 name: string,
+     *                 permitted_voting_range: array{min: int, max: int},
+     *                 value: int,
+     *                 avatars: array<int, array{
+     *                     url: string,
+     *                     height: int,
+     *                 }>
+     *             }>
+     *         }
+     *     },
+     *     current_revision: string
+     * } $change
+     * @param array<string, array<string,string|int|bool|null>> $involved
+     */
+    private function addToInvolved(array $change, string $type, array &$involved): void
+    {
+        foreach (($change['labels'][$type]['all'] ?? []) as $involvedPerson) {
+            if (!isset($involvedPerson['username'])) {
+                $involvedPerson['username'] = $involvedPerson['name'];
+            }
+            if (!isset($involved[$involvedPerson['username']])) {
+                $involved[$involvedPerson['username']] = [
+                    'comments'      => 0,
+                    'Verified'      => 0,
+                    'Code-Review'   => 0,
+                    'owner'         => false,
+                    'avatar'        => $this->findBiggestAvatar($involvedPerson['avatars']),
+                    'username'      => $involvedPerson['name'],
+                ];
+            }
+
+            if (empty($involved[$involvedPerson['username']]['avatar'])) {
+                $involved[$involvedPerson['username']]['avatar'] = $this->findBiggestAvatar($involvedPerson['avatars']);
+            }
+
+            $involved[$involvedPerson['username']][$type] = $involvedPerson['value'];
+        }
+    }
+
+    /**
+     * @param array<string, array<?string,string|int|bool|null>> $involved
+     * @param array<int,string> $coreTeam
+     */
+    private function parseInvolved(array $involved, array $coreTeam, bool $hasUnresolvedComments): string
+    {
+        $avatars = [];
+
+        $coreVerified = 0;
+        $otherVerified = 0;
+        $coreCodeReview = 0;
+        $otherCodeReview = 0;
+        $ciVerified = 0;
+        $blocked = false;
+
+        foreach ($involved as $username => $involvedPerson) {
+            $css = [];
+            if (in_array($username, $coreTeam, true)) {
+                $isCoreMember = true;
+                $css[] = 'core-member';
+            } else {
+                $isCoreMember = false;
+            }
+
+            $points = 0;
+            switch ((int) ($involvedPerson['Verified'] ?? 0)) {
+                case -2:
+                    $css[] = 'downvote2-verified';
+                    $blocked = true;
+                    break;
+                case -1:
+                    $css[] = 'downvote1-verified';
+                    $blocked = true;
+                    break;
+                case 0:
+                    $css[] = 'no-verified';
+                    break;
+                case 1:
+                    $css[] = 'upvote1-verified';
+                    $points = 1;
+                    break;
+                case 2:
+                    $css[] = 'upvote2-verified';
+                    $points = 1;
+                    break;
+            }
+
+            if ($username === 'core-ci') {
+                $css[] = 'ci-member';
+                if ($points > 0) {
+                    $ciVerified = 1;
+                }
+                $points = 0;
+            }
+
+            if ($involvedPerson['owner'] === 1) {
+                $points = 0;
+            }
+
+            if ($points > 0) {
+                if ($isCoreMember) {
+                    $coreVerified++;
+                } else {
+                    $otherVerified++;
+                }
+            }
+
+            $points = 0;
+            switch ((int) ($involvedPerson['Code-Review'] ?? 0)) {
+                case -2:
+                    $css[] = 'downvote2-codereview';
+                    $blocked = true;
+                    break;
+                case -1:
+                    $css[] = 'downvote1-codereview';
+                    $blocked = true;
+                    break;
+                case 0:
+                    $css[] = 'no-codereview';
+                    break;
+                case 1:
+                    $css[] = 'upvote1-codereview';
+                    $points = 1;
+                    break;
+                case 2:
+                    $css[] = 'upvote2-codereview';
+                    $points = 1;
+                    break;
+            }
+
+            if ($involvedPerson['owner'] === 1) {
+                $points = 0;
+            }
+
+            if ($points > 0) {
+                if ($isCoreMember) {
+                    $coreCodeReview++;
+                } else {
+                    $otherCodeReview++;
+                }
+            }
+
+            if ($isCoreMember) {
+                $displayName = '(Core-Merger) ' . $involvedPerson['username'];
+            } else {
+                $displayName = '(Regular) ' . $involvedPerson['username'];
+            }
+
+            if ($involvedPerson['owner'] === 1) {
+                $displayName .= ' [OWNER]';
+            }
+
+            $avatars[] = '<img class="votevatar ' . implode(' ', $css) . '"
+                               src="' . $involvedPerson['avatar'] . '"
+                               alt="' . htmlspecialchars($displayName) . '"
+                               title="' . htmlspecialchars($displayName) . '">';
+        }
+
+        $avatarHtml = implode(' ', $avatars)
+            . ' <!-- coreVerified: ' . $coreVerified . ' -->'
+            . ' <!-- coreCodeReview: ' . $coreCodeReview . ' -->'
+            . ' <!-- otherVerified: ' . $otherVerified . ' -->'
+            . ' <!-- otherCodeReview: ' . $otherCodeReview . ' -->'
+            . ' <!-- ciVerified: ' . $ciVerified . ' -->'
+            . ' <!-- blocked: ' . $blocked . ' -->';
+
+        if ($blocked) {
+            return '<div class="merge-box merge-impossible">' . $avatarHtml . '</div>';
+        }
+
+        if (
+            // At least one non-owner core member
+            $coreVerified >= 1
+            && $coreCodeReview >= 1
+
+            // And at least 2 votes from core and non-core members
+            && ($otherVerified + $coreVerified) >= 2
+            && ($otherCodeReview + $coreCodeReview) >= 2
+
+            // And Green CI
+            && $ciVerified === 1
+        ) {
+            if ($hasUnresolvedComments) {
+                return '<div class="merge-box merge-maybe-possible">' . $avatarHtml . '</div>';
+            }
+
+            return '<div class="merge-box merge-possible">' . $avatarHtml . '</div>';
+        }
+
+        return '<div class="merge-box merge-neutral">' . $avatarHtml . '</div>';
     }
 }

@@ -19,5 +19,7 @@ CREATE TABLE changes (
      comments INTEGER,
      comments_unresolved INTEGER,
      commit_message TEXT,
-     branch TEXT
+     branch TEXT,
+     involved TEXT,
+     debug TEXT
 );

@@ -152,7 +152,16 @@ final readonly class Core
     <meta name="robots" content="noindex,nofollow">
 ' . $this->includeViteAssets() . '
 </head>
-<body>';
+<body>
+
+<div class="involved">
+ <img class="votevatar no-verified no-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
+ <img class="votevatar upvote1-verified upvote1-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
+ <img class="votevatar upvote2-verified upvote2-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
+ <img class="votevatar downvote1-verified downvote1-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
+ <img class="votevatar downvote2-verified downvote2-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
+</div>
+';
     }
 
     public function htmlFooter(): string
@@ -180,7 +189,6 @@ final readonly class Core
             if (is_array($row)) {
                 $out .= '<li class="issue">';
 
-                // @TODO: Parse all forge links ("Resolves", "Related")
                 $out .= '
                 <details>
                     <summary>
@@ -198,7 +206,7 @@ final readonly class Core
                         </div>
                         <div class="mainLine">
                             <div class="extra2">
-                            ' . date('d.m.Y H:i', (int) $row['last_modified']) . '
+                            ' . $this->timeWithCutoff((int) $row['last_modified']) . '
                             </div>
                             ' . ($row['branch'] !== 'main' ? '
                             <div class="branch">
@@ -216,7 +224,7 @@ final readonly class Core
                         </div>
                         <div class="mainLine">
                             <div class="extra4">
-                            &nbsp;
+                            ' . $row['involved'] . '
                             </div>
                             <div class="age2">
                                 <span title="Days since creation on ' . date('d.m.Y H:i', (int) $row['created']) . '">' . $this->daysSince((int) $row['created'], time()) . '</span>
@@ -225,10 +233,10 @@ final readonly class Core
                     </summary>
                     <article>
                         <div class="gerrit_link">
-                            <a href="' . htmlspecialchars($row['url'] ?? '') . '">Gerrit</a>
+                            <a target="_blank" href="' . htmlspecialchars($row['url'] ?? '') . '">Gerrit</a>
                        </div>
                         <div class="forge_link">
-                            <a href="#">Forge</a>
+                            <a target="_blank" href="#">Forge</a>
                         </div>
 
                         ' . nl2br(htmlspecialchars($row['commit_message'] ?? '')) . '
@@ -282,10 +290,19 @@ final readonly class Core
             return 'M';
         }
 
-        if ($patch_size < 500) {
+        if ($patch_size < 700) {
             return 'L';
         }
 
         return 'XL';
+    }
+
+    private function timeWithCutoff(int $last_modified): string
+    {
+        if ($last_modified > (time() - (86400 * 7))) {
+            return date('d.m.Y H:i', $last_modified);
+        }
+
+        return date('d.m.Y', $last_modified);
     }
 }
