@@ -32,4 +32,51 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('theme', newTheme);
     console.log('Saving theme: ' + newTheme);
   });
+
+  function countMainItems() {
+    const visibleItems = document.querySelectorAll(".mainIssues li:not([style*='display: none'])");
+    document.getElementById('displayCount').innerText = visibleItems.length;
+  }
+
+  countMainItems();
+
+  const listItems = document.querySelectorAll('.mainIssues li');
+  let isFiltered = false;
+  // Filters
+  const filterBlocked = document.getElementById('filter-blocked');
+  filterBlocked.addEventListener('click', () => {
+    isFiltered = !isFiltered;
+
+    listItems.forEach((li) => {
+      const isBlocked = li.querySelector('.merge-impossible') !== null;
+
+      if (isFiltered) {
+        li.style.display = isBlocked ? 'list-item' : 'none';
+      } else {
+        li.style.display = 'list-item';
+      }
+    });
+
+    countMainItems();
+  });
+
+  let isMergeFiltered = false;
+  // Filters
+  const filterMergable = document.getElementById('filter-mergable');
+  filterMergable.addEventListener('click', () => {
+    isMergeFiltered = !isMergeFiltered;
+
+    listItems.forEach((li) => {
+      const isPossible = li.querySelector('.merge-possible') !== null;
+
+      if (isMergeFiltered) {
+        li.style.display = isPossible ? 'list-item' : 'none';
+      } else {
+        li.style.display = 'list-item';
+      }
+    });
+
+    countMainItems();
+  });
+
 });

@@ -6,10 +6,27 @@ on the TYPO3 core and gaining insight over open patches.
 
 # TODO
 
-- Wie zusammengehörige Patches für unterschiedliche Branches mergen?
-- Core-Owner andere Farbe
-- Regulars (Leute wie Torben) andere Farbe
-- avatars
-- anzahl patchsets / revisions
+- Vote-Zustand darstellen
+- Kommentare inlinen (CI ignore)
+- Action links: "Seen this", "Want this", "Abandonable" (-> userservice)
+- Sortierung (JS, Userprefs) - hoch|runter sortierung
 
-Title | WIP? | Owner | Involved People | Branch | Created / Last Modified / Age | Votes
+## Medium Prio
+
+- HTTP-Auth
+- Differenzierung Core-Merger / None-Merger / Regulars (Farbe?)
+  - Filter:
+    - Only new
+    - Only prioritized
+    - Only Voted -1
+    - Only Voted +1
+    - Only merge-ready
+    - Sort by priority
+    - Sort by Last Change
+    - Find by owner: [______]
+    - Restrict by <BUGFIX|DOCS|TASK|FEATURE|WIP>
+
+## Low Prio
+- Unterscheidung DOCS / TASK / BUGFIX / FEATURE / WIP
+- Breaking Change (!!!) auswerten
+- Forge Links ("Resolves", "Related") aus commit message extrahieren

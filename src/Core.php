@@ -106,8 +106,10 @@ final readonly class Core
 
         echo $this->htmlHead();
 
-        echo '<h1>Gerrit patches ON MAIN</h1>';
+        echo '<h1><span id="displayCount">&nbsp;</span> Gerrit patches ON MAIN</h1>';
+        echo '<div class="mainIssues">';
         echo $this->renderList('SELECT * FROM changes WHERE branch = "main" AND is_active = 1');
+        echo '</div>';
 
         echo '<h1>Gerrit patches cherry-picks</h1>';
         echo $this->renderList('SELECT * FROM changes WHERE branch != "main" AND is_active = 1');
@@ -154,13 +156,8 @@ final readonly class Core
 </head>
 <body>
 
-<div class="involved">
- <img class="votevatar no-verified no-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
- <img class="votevatar upvote1-verified upvote1-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
- <img class="votevatar upvote2-verified upvote2-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
- <img class="votevatar downvote1-verified downvote1-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
- <img class="votevatar downvote2-verified downvote2-codereview" src="https://www.gravatar.com/avatar/a0751c5152f32a164e4a26a86aa27c04.jpg?d=identicon&r=pg&s=120">
-</div>
+<button id="filter-blocked">Toggle blocked</button>
+<button id="filter-mergable">Toggle mergable</button>
 ';
     }
 
