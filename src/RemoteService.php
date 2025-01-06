@@ -98,7 +98,11 @@ final readonly class RemoteService
          *     virtual_id_number: int,
          *     owner: array{
          *         name: string,
-         *         username: string
+         *         username: string,
+         *         avatars: array<int, array{
+         *             url: string,
+         *             height: int,
+         *         }>
          *     },
          *     subject: string,
          *     updated: string,
@@ -133,6 +137,7 @@ final readonly class RemoteService
                   SET is_active = 1,
                       title = :title,
                       owner = :owner,
+                      owner_avatar = :owner_avatar,
                       is_wip = :is_wip,
                       url = :url,
                       patch_size = :patch_size,
@@ -156,6 +161,7 @@ final readonly class RemoteService
             // TODO: "Please move forward"
             $updateQuery->bindValue(':title', $change['subject'], SQLITE3_TEXT);
             $updateQuery->bindValue(':owner', $change['owner']['name'], SQLITE3_TEXT);
+            $updateQuery->bindValue(':owner_avatar', $this->findBiggestAvatar($change['owner']['avatars']), SQLITE3_TEXT);
             $updateQuery->bindValue(':is_wip', (int) str_contains($change['subject'], '[WIP]'), SQLITE3_INTEGER);
             $updateQuery->bindValue(':url', 'https://review.typo3.org/c/Packages/TYPO3.CMS/+/' . $change['virtual_id_number'], SQLITE3_TEXT);
             $updateQuery->bindValue(':patch_size', abs($change['insertions']) + abs($change['deletions']), SQLITE3_INTEGER);
@@ -318,5 +324,23 @@ final readonly class RemoteService
         }
 
         return 0;
+    }
+
+    /** @param array<int, array{
+     * url: string,
+     * height: int,
+     * }> $avatars */
+    private function findBiggestAvatar(array $avatars): string
+    {
+        $pickedAvatar = '';
+        $maxHeight = 0;
+        foreach ($avatars as $avatar) {
+            if ($maxHeight < $avatar['height']) {
+                $pickedAvatar = $avatar['url'];
+                $maxHeight = $avatar['height'];
+            }
+        }
+
+        return $pickedAvatar;
     }
 }

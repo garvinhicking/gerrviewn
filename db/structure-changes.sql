@@ -3,6 +3,7 @@ CREATE TABLE changes (
      gerrit_uid INTEGER NOT NULL,
      title TEXT,
      owner TEXT,
+     owner_avatar TEXT,
      is_active INTEGER,
      is_wip INTEGER,
      community_verified INTEGER,

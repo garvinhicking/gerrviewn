@@ -158,6 +158,21 @@ li.issue {
         background: var(--box-color);
         border-radius: 0 0px 20px 20px;
     }
+
+    img.avatar {
+        height: 50px;
+        float: right;
+        margin: 0 0 0 7px;
+    }
+
+    a,a:visited {
+        color: var(--highlight-color);
+        text-decoration: underline;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
 }
 
 #theme-toggle {

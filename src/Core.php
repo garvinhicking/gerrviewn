@@ -15,7 +15,7 @@ final readonly class Core
     private LogService $logService;
     private bool $isInitialized;
 
-    public function __construct()
+    public function __construct(bool $reset = false, bool $fetchJsonFirstRun = true)
     {
         $this->path = __DIR__ . '/../db/';
         $this->webroot = __DIR__ . '/../public/';
@@ -36,12 +36,19 @@ final readonly class Core
         if (!file_exists($sqlite)) {
             $fresh = true;
         }
+        if ($reset) {
+            unlink($sqlite);
+            $fresh = true;
+        }
+
         $this->db = new SQLite3($sqlite);
 
         if ($fresh) {
             $this->initDatabaseTables();
             $remoteService = new RemoteService($this->logService, $this->db);
-            $remoteService->run();
+            if ($fetchJsonFirstRun) {
+                $remoteService->run();
+            }
             $remoteService->hydrate();
             $this->isInitialized = true;
         } else {
@@ -183,16 +190,18 @@ final readonly class Core
                             ' . $row['comments'] . ' comments, ' . $row['patch_size'] . ' lines.
                             </div>
                             <div class="author">
-                            ' . htmlspecialchars($row['owner'] ?? 'N/A') . '
+                              <img class="avatar" src="' . htmlspecialchars($row['owner_avatar'] ?? '') . '" />' . htmlspecialchars($row['owner'] ?? 'N/A') . '
                             </div>
                         </div>
                         <div class="mainLine">
                             <div class="extra2">
                             ' . date('d.m.Y H:i', (int) $row['last_modified']) . '
                             </div>
+                            ' . ($row['branch'] !== 'main' ? '
                             <div class="branch">
                             ' . htmlspecialchars($row['branch'] ?? 'N/A') . '
                             </div>
+                            ' : '') . '
                         </div>
                         <div class="mainLine">
                             <div class="extra3">
